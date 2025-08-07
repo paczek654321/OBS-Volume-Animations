@@ -46,11 +46,15 @@ class AudioManager():
 		self.pyAudio = pyaudio.PyAudio()
 
 		device = self.find_device_by_name(AUDIO_DEVICE)
+		if (device == None):
+			self.unload()
+			return
 		self.stream = self.pyAudio.open(format=pyaudio.paInt16, channels=1, rate=math.floor(device["defaultSampleRate"]), input=True, frames_per_buffer=1024, input_device_index=device["index"])
 	
 	def unload(self):
-		self.stream.stop_stream()
-		self.stream.close()
+		if (hasattr(self, "stream")):
+			self.stream.stop_stream()
+			self.stream.close()
 		self.pyAudio.terminate()
 
 	def find_device_by_name(self, name):
@@ -69,6 +73,7 @@ audioManager = AudioManager()
 
 talking = 0
 def update():
+	if (not hasattr(audioManager, "stream")): return
 	global talking
 	if (audioManager.get_volume() > VOLUME_GATE):
 		if (talking < GRACE_PERIOD): set_state(True)
