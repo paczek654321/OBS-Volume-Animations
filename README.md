@@ -2,7 +2,7 @@
 ## Description
 This is a python plugin for OBS, that lets you hide/show 2 scene items based on the volume of your microphone input.
 The plugin uses your system input, not the OBS one.
-Currently it only works on Linux as the audio source defaults to pipewire.
+In order for this plugin to work on Windows you have to change the adio device, one that seems to work is: "Microsoft Sound mapping - Input"
 ## Usage
 1. In OBS go to Tools → Scripts
 2. Click the plus button and select this script

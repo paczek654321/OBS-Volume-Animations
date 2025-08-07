@@ -5,6 +5,7 @@ VOLUME_GATE = -40
 GRACE_PERIOD = 5
 TALKING_ITEM_NAME = "name"
 SILENT_ITEM_NAME = "name"
+AUDIO_DEVICE = "pipewire"
 
 def script_properties():
 	settings = obs.obs_properties_create()
@@ -12,6 +13,7 @@ def script_properties():
 	obs.obs_properties_add_int(settings, "update_frequency", "Update Frequency (ms)", 10, 1000, 10)
 	obs.obs_properties_add_float_slider(settings, "volume_gate", "Volume Gate (dB)", -90.0, 0.0, 1.0)
 	obs.obs_properties_add_int(settings, "grace_period_ms", "Grace Period (ms)", 0, 10000, 10)
+	obs.obs_properties_add_text(settings, "audio_device", "Audio Device (Requires reload)", obs.OBS_TEXT_DEFAULT)
 	obs.obs_properties_add_text(settings, "talking_item_name", "Talking Item Name", obs.OBS_TEXT_DEFAULT)
 	obs.obs_properties_add_text(settings, "silent_item_name", "Silent Item Name", obs.OBS_TEXT_DEFAULT)
 
@@ -21,7 +23,8 @@ def script_defaults(settings):
     obs.obs_data_set_default_int(settings, "update_frequency", UPDATE_FREQUENCY)
     obs.obs_data_set_default_double(settings, "volume_gate", VOLUME_GATE)
     obs.obs_data_set_default_int(settings, "grace_period_ms", GRACE_PERIOD*UPDATE_FREQUENCY)
-    obs.obs_data_set_default_string(settings, "talking_item_name", TALKING_ITEM_NAME)
+    obs.obs_data_set_default_string(settings, "audio_device", AUDIO_DEVICE)
+	obs.obs_data_set_default_string(settings, "talking_item_name", TALKING_ITEM_NAME)
     obs.obs_data_set_default_string(settings, "silent_item_name", SILENT_ITEM_NAME)
 
 def script_update(settings):
@@ -34,6 +37,7 @@ def script_update(settings):
 
 	VOLUME_GATE = obs.obs_data_get_double(settings, "volume_gate")
 	GRACE_PERIOD = math.ceil(obs.obs_data_get_int(settings, "grace_period_ms")/UPDATE_FREQUENCY)
+	AUDIO_DEVICE = obs.obs_data_get_string(settings, "audio_device")
 	TALKING_ITEM_NAME = obs.obs_data_get_string(settings, "talking_item_name")
 	SILENT_ITEM_NAME = obs.obs_data_get_string(settings, "silent_item_name")
 
@@ -41,7 +45,7 @@ class AudioManager():
 	def __init__(self):
 		self.pyAudio = pyaudio.PyAudio()
 
-		device = self.find_device_by_name("pipewire")
+		device = self.find_device_by_name(AUDIO_DEVICE)
 		self.stream = self.pyAudio.open(format=pyaudio.paInt16, channels=1, rate=math.floor(device["defaultSampleRate"]), input=True, frames_per_buffer=1024, input_device_index=device["index"])
 	
 	def unload(self):
@@ -58,7 +62,7 @@ class AudioManager():
 		data = np.frombuffer(self.stream.read(self.stream._frames_per_buffer, exception_on_overflow=False), dtype=np.int16)
 		data = data.astype(np.float32)
 		volume = np.sqrt(np.mean(data**2))
-		if volume == 0: return volume
+		if volume == 0: return -math.inf
 		return 20 * np.log10(volume/32768)
 
 audioManager = AudioManager()
