@@ -20,12 +20,12 @@ def script_properties():
 	return settings
 
 def script_defaults(settings):
-    obs.obs_data_set_default_int(settings, "update_frequency", UPDATE_FREQUENCY)
-    obs.obs_data_set_default_double(settings, "volume_gate", VOLUME_GATE)
-    obs.obs_data_set_default_int(settings, "grace_period_ms", GRACE_PERIOD*UPDATE_FREQUENCY)
-    obs.obs_data_set_default_string(settings, "audio_device", AUDIO_DEVICE)
+	obs.obs_data_set_default_int(settings, "update_frequency", UPDATE_FREQUENCY)
+	obs.obs_data_set_default_double(settings, "volume_gate", VOLUME_GATE)
+	obs.obs_data_set_default_int(settings, "grace_period_ms", GRACE_PERIOD*UPDATE_FREQUENCY)
+	obs.obs_data_set_default_string(settings, "audio_device", AUDIO_DEVICE)
 	obs.obs_data_set_default_string(settings, "talking_item_name", TALKING_ITEM_NAME)
-    obs.obs_data_set_default_string(settings, "silent_item_name", SILENT_ITEM_NAME)
+	obs.obs_data_set_default_string(settings, "silent_item_name", SILENT_ITEM_NAME)
 
 def script_update(settings):
 	global UPDATE_FREQUENCY, VOLUME_GATE, GRACE_PERIOD_MS, GRACE_PERIOD, TALKING_ITEM_NAME, SILENT_ITEM_NAME
