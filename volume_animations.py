@@ -14,6 +14,7 @@ def script_properties():
 	obs.obs_properties_add_float_slider(settings, "volume_gate", "Volume Gate (dB)", -90.0, 0.0, 1.0)
 	obs.obs_properties_add_int(settings, "grace_period_ms", "Grace Period (ms)", 0, 10000, 10)
 	obs.obs_properties_add_text(settings, "audio_device", "Audio Device (Requires reload)", obs.OBS_TEXT_DEFAULT)
+	obs.obs_properties_add_button(settings, "get_device_list", "Get Device List", lambda props, prop: audioManager.get_devices())
 	obs.obs_properties_add_text(settings, "talking_item_name", "Talking Item Name", obs.OBS_TEXT_DEFAULT)
 	obs.obs_properties_add_text(settings, "silent_item_name", "Silent Item Name", obs.OBS_TEXT_DEFAULT)
 
@@ -68,6 +69,13 @@ class AudioManager():
 		volume = np.sqrt(np.mean(data**2))
 		if volume == 0: return -math.inf
 		return 20 * np.log10(volume/32768)
+
+	def get_devices(self):
+		obs.script_log(obs.LOG_WARNING, "-----Device List:-----")
+		for i in range(self.pyAudio.get_device_count()):
+			info = self.pyAudio.get_device_info_by_index(i)
+			if (info["maxInputChannels"] > 0): print(info["name"])
+		print("----------------------")
 
 audioManager = AudioManager()
 
